@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Principled Design of Diffusion-based Optimizers for Inverse Problems | OptDiff</title>
+  <meta name="description" content="OptDiff makes diffusion models easier to tune and faster to use for reconstructing MRI images, removing blur, and recovering image detail.">
+  <meta name="author" content="Julio Oscanoa, Irmak Sivgin, Cagan Alkan, Daniel Ennis, John Pauly, Mert Pilanci, Shreyas Vasanawala">
+  <meta name="keywords" content="OptDiff, diffusion models, inverse problems, MRI reconstruction, noise schedules, optimization">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Principled Design of Diffusion-based Optimizers for Inverse Problems">
+  <meta property="og:description" content="OptDiff makes diffusion models easier to tune and faster to use for reconstructing MRI images, removing blur, and recovering image detail.">
+  <meta property="og:site_name" content="OptDiff">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Principled Design of Diffusion-based Optimizers for Inverse Problems">
+  <meta name="twitter:description" content="OptDiff makes diffusion models easier to tune and faster to use for reconstructing MRI images, removing blur, and recovering image detail.">
+  <meta name="citation_title" content="Principled Design of Diffusion-based Optimizers for Inverse Problems">
+  <meta name="citation_author" content="Julio Oscanoa">
+  <meta name="citation_author" content="Irmak Sivgin">
+  <meta name="citation_author" content="Cagan Alkan">
+  <meta name="citation_author" content="Daniel Ennis">
+  <meta name="citation_author" content="John Pauly">
+  <meta name="citation_author" content="Mert Pilanci">
+  <meta name="citation_author" content="Shreyas Vasanawala">
+
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="Advances in Neural Information Processing Systems (NeurIPS 2026)">
+  <meta name="theme-color" content="#e5e9ee">
+  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2605.11506">
+  <link rel="icon" type="image/svg+xml" href="static/images/optdiff.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css?v=reading-switch-20261002">
+  <script defer src="static/js/index.js?v=reading-switch-20261002"></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "ScholarlyArticle", "headline": "Principled Design of Diffusion-based Optimizers for Inverse Problems", "description": "OptDiff makes diffusion models easier to tune and faster to use for reconstructing MRI images, removing blur, and recovering image detail.", "author": [{"@type": "Person", "name": "Julio Oscanoa", "affiliation": [{"@type": "Organization", "name": "Department of Bioengineering", "parentOrganization": {"@type": "Organization", "name": "Stanford University"}}, {"@type": "Organization", "name": "Department of Radiology", "parentOrganization": {"@type": "Organization", "name": "Stanford University"}}]}, {"@type": "Person", "name": "Irmak Sivgin", "affiliation": [{"@type": "Organization", "name": "Department of Electrical Engineering", "parentOrganization": {"@type": "Organization", "name": "Stanford University"}}]}, {"@type": "Person", "name": "Cagan Alkan", "affiliation": [{"@type": "Organization", "name": "Department of Electrical Engineering", "parentOrganization": {"@type": "Organization", "name": "Stanford University"}}]}, {"@type": "Person", "name": "Daniel Ennis", "affiliation": [{"@type": "Organization", "name": "Department of Radiology", "parentOrganization": {"@type": "Organization", "name": "Stanford University"}}]}, {"@type": "Person", "name": "John Pauly", "affiliation": [{"@type": "Organization", "name": "Department of Electrical Engineering", "parentOrganization": {"@type": "Organization", "name": "Stanford University"}}]}, {"@type": "Person", "name": "Mert Pilanci", "affiliation": [{"@type": "Organization", "name": "Department of Electrical Engineering", "parentOrganization": {"@type": "Organization", "name": "Stanford University"}}]}, {"@type": "Person", "name": "Shreyas Vasanawala", "affiliation": [{"@type": "Organization", "name": "Department of Radiology", "parentOrganization": {"@type": "Organization", "name": "Stanford University"}}]}], "datePublished": "2026", "creativeWorkStatus": "Accepted", "isAccessibleForFree": true, "isPartOf": {"@type": "PublicationVolume", "name": "Advances in Neural Information Processing Systems (NeurIPS 2026)"}, "sameAs": "https://arxiv.org/abs/2605.11506"}</script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<button class="scroll-to-top" id="scroll-to-top" type="button" aria-label="Scroll to top">↑</button>
+<div class="reading-bar">
+ <nav class="reading-switch" aria-label="Reading version">
+  <span class="reading-label" aria-hidden="true">Reading version</span>
+  <div class="reading-options"><a href="index.html" data-version-page="index.html">Technical</a><a href="index-general.html" data-version-page="index-general.html" aria-current="page">Accessible</a></div>
+ </nav>
+</div>
+<main id="main-content">
+<section class="hero publication-header" aria-labelledby="paper-title">
+  <div class="hero-body"><div class="container is-max-desktop"><div class="columns is-centered"><div class="column has-text-centered">
+    <p class="project-name">OptDiff <span>·</span> Stanford University</p>
+    <h1 id="paper-title" class="title is-1 publication-title">Principled Design of Diffusion-based Optimizers for Inverse Problems</h1>
+    <div class="is-size-5 publication-authors author-list">
+      <span class="author-block">Julio Oscanoa<sup>1,2,*</sup></span>
+      <span class="author-block">Irmak Sivgin<sup>3,*</sup></span>
+      <span class="author-block">Cagan Alkan<sup>3,*</sup></span>
+      <span class="author-block">Daniel Ennis<sup>2</sup></span>
+      <span class="author-block">John Pauly<sup>3</sup></span>
+      <span class="author-block">Mert Pilanci<sup>3,†</sup></span>
+      <span class="author-block">Shreyas Vasanawala<sup>2,†</sup></span>
+    </div>
+    <p class="affiliations"><span><sup>1</sup> Department of Bioengineering</span> <span><sup>2</sup> Department of Radiology</span> <span><sup>3</sup> Department of Electrical Engineering</span><br>Stanford University</p>
+    <p class="eql-cntrb">* Equal contribution &nbsp; † Equal senior contribution</p>
+    <p class="publication-venue">Accepted to NeurIPS 2026</p>
+    <div class="publication-links">
+      <!-- Activate the Code button when the public repository is available. -->
+      <span class="link-block"><a class="external-link button is-normal is-rounded is-dark" href="https://arxiv.org/abs/2605.11506" target="_blank" rel="noopener">Paper <span class="button-detail">arXiv ↗</span></a></span>
+      <span class="link-block"><button class="button is-normal is-rounded is-dark code-placeholder" type="button" disabled aria-describedby="code-status">Code <span class="button-detail">Coming soon</span></button></span>
+      <span class="link-block"><a class="button is-normal is-rounded is-dark" href="#BibTeX">BibTeX</a></span>
+    </div>
+    <p class="availability-note" id="code-status">Code release in preparation.</p>
+    <nav class="section-nav" aria-label="Page sections"><a href="#abstract">Summary</a><a href="#motivation">Motivation</a><a href="#method">Method</a><a href="#contributions">Contributions</a><a href="#results">Results</a><a href="#BibTeX">Citation</a></nav>
+  </div></div></div></div>
+</section>
+<section class="hero teaser" id="overview-figure" aria-label="Research overview">
+ <div class="container is-max-desktop"><div class="hero-body">
+ <figure class="paper-figure">
+  <a class="figure-link" href="static/images/updated_invariance2.jpeg" target="_blank" rel="noopener" aria-label="Enlarge figure: Plots comparing the original and proposed settings across reconstruction conditions, followed by image quality comparisons using 20 and 100 model calls for MRI, deblurring, and super-resolution. (opens in a new tab)">
+    <img src="static/images/updated_invariance2.jpeg" alt="Plots comparing the original and proposed settings across reconstruction conditions, followed by image quality comparisons using 20 and 100 model calls for MRI, deblurring, and super-resolution." width="1299" height="1113" loading="eager" decoding="async" fetchpriority="high">
+  </a>
+  <figcaption><strong>Settings that are easier to reuse. Faster image reconstruction.</strong> OptDiff changes how reconstruction settings are expressed so that similar choices work across different problems and stages of reconstruction (top). It also improves image quality with limited calls to the diffusion model (bottom). <a href="static/images/updated_invariance2.jpeg" target="_blank" rel="noopener">View full resolution<span class="sr-only"> (opens in a new tab)</span> ↗</a></figcaption>
+</figure>
+ </div></div>
+</section>
+<section class="section hero is-light" id="abstract" aria-labelledby="abstract-title">
+ <div class="container is-max-desktop"><div class="columns is-centered"><div class="column is-four-fifths">
+  <h2 id="abstract-title" class="title is-3 has-text-centered">Paper summary</h2>
+  <div class="content has-text-justified"><p>Diffusion models learn image structure by learning to remove noise. That knowledge can help reconstruct an MRI scan, remove blur from a photograph, or recover detail from a smaller image. These tasks are called inverse problems: we observe an altered version of an image and try to recover the original. Although a trained model can help with different tasks, reconstruction is often slow and requires careful adjustment of its settings.</p>
+  <p>We introduce ways to express these settings so they are less sensitive to changes in the reconstruction problem. This makes them easier to reuse. We also develop <strong>OptDiff: Optimizers with Diffusion-based priors</strong>, building on RED-diff, an existing method that treats reconstruction as an optimization problem. OptDiff simplifies the search for suitable settings and makes it easier to use established techniques for faster reconstruction. Experiments with MRI and photographs show improvements in speed and image quality.</p></div>
+ </div></div></div>
+</section>
+<section class="section" id="motivation" aria-labelledby="motivation-title">
+ <div class="container is-max-desktop">
+  <h2 id="motivation-title" class="title is-3 has-text-centered">Motivation</h2>
+  <p class="section-intro">A pretrained diffusion model is a powerful image prior: it provides knowledge about image structure learned from training data. Reconstruction methods combine that knowledge with measurements to recover an image. In practice, this process can be slow, and its success depends heavily on settings chosen by the user.</p>
+  <div class="columns is-variable is-5 motivation-grid">
+   <div class="column"><div class="insight"><span class="step-number">01</span><h3 class="title is-5">Many reconstruction steps</h3><p>Many methods refine an image over hundreds of steps. Repeated calls to the diffusion model make reconstruction costly, especially when results are needed quickly.</p></div></div>
+   <div class="column"><div class="insight"><span class="step-number">02</span><h3 class="title is-5">Settings that need retuning</h3><p>The settings used during reconstruction are called hyperparameters. Poor choices can produce unstable updates or lower image quality. A change in the measurements or task often means searching for suitable settings again.</p></div></div>
+   <div class="column"><div class="insight"><span class="step-number">03</span><h3 class="title is-5">Reusable settings and faster methods</h3><p>We make two contributions. First, we derive ways to express reconstruction settings that make them more consistent across problems. Second, building on RED-diff, we introduce a tuning procedure that helps incorporate established techniques for faster reconstruction.</p></div></div>
+  </div>
+ </div>
+</section>
+<section class="section hero is-light" id="method" aria-labelledby="method-title">
+ <div class="container is-max-desktop">
+  <h2 id="method-title" class="title is-3 has-text-centered">Method overview</h2>
+  <p class="section-intro">OptDiff addresses three connected choices: which noise levels to use during reconstruction, how to balance the measurements with the model’s guidance, and how to choose suitable settings using a few reference images.</p>
+  <ol class="pipeline">
+   <li><strong>Choose the start and stop noise levels</strong><span>The noise schedule sets the noise levels used as the image is refined. We derive start and stop rules that account for what the measurements already reveal and how much noise the data contain. Expressing these rules as relative tolerances makes the settings easier to reuse.</span></li>
+   <li><strong>Balance measurements and learned image knowledge</strong><span>Each update must balance agreement with the measurements against guidance from the diffusion model. We put these two contributions on a common scale, then analyze when one balance setting can work throughout reconstruction.</span></li>
+   <li><strong>Use reference images to guide tuning</strong><span>On a small set of reference images, we find which update weights work best at each step. These examples let us select the noise schedule separately from the update settings, narrow the search, and incorporate techniques that speed up reconstruction.</span></li>
+  </ol>
+
+ </div>
+</section>
+<section class="section" id="contributions" aria-labelledby="contributions-title">
+ <div class="container is-max-desktop">
+  <h2 id="contributions-title" class="title is-3 has-text-centered">Key contributions</h2>
+  <article class="contribution"><h3 class="title is-4">1. Choosing the start and stop noise levels</h3>
+   <p>Diffusion models reconstruct images through a sequence of steps at decreasing noise levels. We derive rules for where this sequence should start and stop: the starting point depends on which image details remain unknown after using the measurements, while the stopping point accounts for the noise already present in the data.</p>
+   <p>Instead of tuning absolute noise levels for each new problem, we express these rules using two relative tolerances. These settings adapt to the properties of the data and measurements, making them easier to reuse across problems. Because the rules do not depend on a particular reconstruction algorithm, other diffusion-based solvers can use them too.</p>
+   <figure class="paper-figure">
+  <a class="figure-link" href="static/images/noise_schedule.jpeg" target="_blank" rel="noopener" aria-label="Enlarge figure: Plots and MRI images showing how broad image structure and fine details guide the choice of starting and stopping noise levels. (opens in a new tab)">
+    <img src="static/images/noise_schedule.jpeg" alt="Plots and MRI images showing how broad image structure and fine details guide the choice of starting and stopping noise levels." width="2376" height="901" loading="lazy" decoding="async">
+  </a>
+  <figcaption><strong>From broad structure to fine detail.</strong> Diffusion reconstructs finer details using the broader image structure recovered earlier (left). The information already supplied by the measurements and the noise in the data guide where reconstruction starts and stops (right). <a href="static/images/noise_schedule.jpeg" target="_blank" rel="noopener">View full resolution<span class="sr-only"> (opens in a new tab)</span> ↗</a></figcaption>
+</figure>
+   <details><summary>The equations behind the start and stop rules</summary><div class="detail-body">
+    <div class="equation"><math display="block" aria-label="sigma max squared is at least (1 minus tau max) divided by tau max, times the maximum eigenvalue of the high-frequency covariance conditioned on low frequencies"><msubsup><mi>σ</mi><mtext>max</mtext><mn>2</mn></msubsup><mo>≥</mo><mfrac><mrow><mn>1</mn><mo>−</mo><msub><mi>τ</mi><mtext>max</mtext></msub></mrow><msub><mi>τ</mi><mtext>max</mtext></msub></mfrac><msub><mi>ν</mi><mtext>max</mtext></msub><mo>(</mo><msub><mi>Σ</mi><mrow><mi>H</mi><mo>|</mo><mi>L</mi></mrow></msub><mo>)</mo></math></div>
+    <p>The start rule assumes that the broad image structure, represented by low frequencies, is known exactly. Σ<sub>H|L</sub> describes the remaining uncertainty in finer details, and ν<sub>max</sub> is its largest eigenvalue. The tolerance τ<sub>max</sub> limits the relative reduction in uncertainty at the first step. In practice, we use the smallest starting noise level allowed by this bound.</p>
+    <div class="equation"><math display="block" aria-label="In the high signal-to-noise regime, sigma min squared is approximately at most tau min times sigma s squared"><msubsup><mi>σ</mi><mtext>min</mtext><mn>2</mn></msubsup><mo>≲</mo><msub><mi>τ</mi><mtext>min</mtext></msub><msubsup><mi>σ</mi><mi>s</mi><mn>2</mn></msubsup></math></div>
+    <p>The stop rule accounts for the noise already present in the data, with variance σ<sub>s</sub><sup>2</sup>. The tolerance τ<sub>min</sub> sets how close the remaining uncertainty should be to the best attainable level. This simpler expression applies when the signal is strong relative to the noise; the paper gives the full bound.</p>
+   </div></details>
+  </article>
+  <article class="contribution"><h3 class="title is-4">2. Balancing measurements and learned image knowledge</h3>
+   <p>Each reconstruction step balances two sources of guidance: agreement with the measurements and the image knowledge learned by the diffusion model. Their strengths can change during reconstruction, making that balance difficult to tune.</p>
+   <p>We put the two gradients, which describe how the two goals guide changes to the image, on the same scale before combining them. This is called normalization. It gives a single parameter, λ̂, a consistent role in controlling their relative influence.</p>
+   <div class="equation"><math display="block" aria-label="Delta mu at step k equals negative alpha hat at step k times the sum of the normalized data gradient and lambda hat times the normalized prior gradient">
+    <mi>Δ</mi><msup><mi>μ</mi><mi>k</mi></msup><mo>=</mo><mo>−</mo><msup><mover><mi>α</mi><mo>^</mo></mover><mi>k</mi></msup><mo>(</mo>
+    <mfrac><mrow><mo>∇</mo><msup><mi>f</mi><mi>k</mi></msup></mrow><mrow><mo>‖</mo><mo>∇</mo><msup><mi>f</mi><mi>k</mi></msup><msub><mo>‖</mo><mn>2</mn></msub></mrow></mfrac>
+    <mo>+</mo><mover><mi>λ</mi><mo>^</mo></mover>
+    <mfrac><mrow><mo>∇</mo><msup><mi>g</mi><mi>k</mi></msup></mrow><mrow><mo>‖</mo><mo>∇</mo><msup><mi>g</mi><mi>k</mi></msup><msub><mo>‖</mo><mn>2</mn></msub></mrow></mfrac><mo>)</mo>
+   </math></div>
+   <p class="equation-key">In this equation, <em>f</em> measures disagreement with the measurements, while <em>g</em> represents guidance from the diffusion model. Each gradient is divided by its length before the two are combined. α̂<sup>k</sup> controls the size of the update, and λ̂ controls the model’s relative influence. Both gradients must be nonzero.</p>
+   <p>Using the existing RED-diff framework, we analyze when an update can improve both agreement with the measurements and agreement with the model. The answer depends on how well the two suggested directions align. This gives conditions under which the same balance setting can be used throughout reconstruction.</p>
+   <div class="compact-figure"><figure class="paper-figure">
+  <a class="figure-link" href="static/images/commondescent.png" target="_blank" rel="noopener" aria-label="Enlarge figure: Plots comparing how standard weighting and OptDiff balance the measurements with the diffusion model, alongside the range where updates can improve both goals. (opens in a new tab)">
+    <img src="static/images/commondescent.png" alt="Plots comparing how standard weighting and OptDiff balance the measurements with the diffusion model, alongside the range where updates can improve both goals." width="1678" height="1220" loading="lazy" decoding="async" >
+  </a>
+  <figcaption><strong>When the two sources of guidance work together.</strong> The standard weighting can fall outside the range that supports improvement in both objectives (left). Normalization makes the balance more consistent; choices outside the predicted range are associated with lower reconstruction quality in these experiments (right). <a href="static/images/commondescent.png" target="_blank" rel="noopener">View full resolution<span class="sr-only"> (opens in a new tab)</span> ↗</a></figcaption>
+</figure></div>
+  </article>
+  <article class="contribution"><h3 class="title is-4">3. Guiding parameter selection with reference images</h3>
+   <p>We use a small set of images with known reference reconstructions to guide parameter selection. At each step, we find the update weights that bring the current reconstruction closest to its reference. This is the greedy-optimal part of the procedure: it chooses the best weights for the next step, rather than optimizing all future steps at once.</p>
+   <p>These reference weights let us choose the noise schedule first, then search a smaller range of settings for the reconstruction updates. Building on RED-diff, this procedure also makes it easier to incorporate established acceleration methods, including momentum, which uses information from earlier updates, and preconditioning, which adjusts updates to the measurement model.</p>
+   <p class="research-note">Reference images are needed only to select the settings. Reconstructing a new image uses its measurements, the trained diffusion model, and the selected settings.</p>
+  </article>
+ </div>
+</section>
+<section class="section hero is-light" id="results" aria-labelledby="results-title">
+ <div class="container is-max-desktop">
+  <h2 id="results-title" class="title is-3 has-text-centered">Results</h2>
+  <p class="section-intro">We test whether settings can be reused across problems, whether other reconstruction methods benefit from our noise schedule, and how well the reconstructed images match their references. The image quality comparisons use 100 calls to the diffusion model per reconstruction.</p>
+  <div class="columns result-highlights" aria-label="Results highlights">
+   <div class="column"><p class="result-value">Settings that transfer</p><p>Our way of expressing the settings makes them easier to reuse across different reconstruction problems and measurement conditions.</p></div>
+   <div class="column"><p class="result-value">Across methods</p><p>Our choice of noise levels improves image quality for a range of existing reconstruction methods.</p></div>
+   <div class="column"><p class="result-value">Up to +3.01 dB on fastMRI</p><p>Tested on MRI reconstruction, removing blur, and recovering image detail using fastMRI, ImageNet, and FFHQ. On fastMRI, OptDiff improves pixel accuracy, measured by PSNR, by up to 3.01 dB over RED-diff.</p></div>
+  </div>
+  <article class="result-section" id="invariance-results">
+   <h3 class="title is-4">1. Reusing settings across problems and methods</h3>
+   <p>The experiments in <a href="#overview-figure">Figure 1 above</a> show that similar settings give good results across different reconstruction conditions. The curves also become more consistent across different stages of reconstruction, supporting the use of one setting to balance measurement agreement and guidance from the model.</p>
+   <h4 class="title is-5">Applying the noise schedule to other methods</h4>
+   <p>We replace the sequence of noise levels used by existing methods with our proposed schedule. The tables compare pixel accuracy (PSNR); higher values mean a closer match to the reference image.</p>
+   <div class="schedule-comparisons"><div class="table-container" role="region" aria-label="MRI reconstruction · fastMRI · R = 8 schedule comparison" tabindex="0"><table class="table is-fullwidth research-table"><caption>MRI reconstruction · fastMRI · R = 8 · Mean PSNR (dB) ↑</caption><thead><tr><th scope="col">Method</th><th scope="col">Standard<br>schedule</th><th scope="col">Proposed<br>schedule</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>28.94</td><td>30.43</td></tr><tr><th scope="row">ΠGDM</th><td>28.88</td><td>29.29</td></tr><tr><th scope="row">RED-diff</th><td><strong>31.92</strong></td><td><u>33.38</u></td></tr><tr><th scope="row">DAPS</th><td><u>31.38</u></td><td>29.89</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td>Not evaluated</td><td><strong>34.93</strong></td></tr></tbody></table></div><div class="table-container" role="region" aria-label="Deblurring · ImageNet schedule comparison" tabindex="0"><table class="table is-fullwidth research-table"><caption>Deblurring · ImageNet · Mean PSNR (dB) ↑</caption><thead><tr><th scope="col">Method</th><th scope="col">Standard<br>schedule</th><th scope="col">Proposed<br>schedule</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>27.51</td><td>38.17</td></tr><tr><th scope="row">DDRM</th><td><strong>36.24</strong></td><td>39.83</td></tr><tr><th scope="row">ΠGDM</th><td>33.85</td><td>32.51</td></tr><tr><th scope="row">RED-diff</th><td><u>35.94</u></td><td><u>40.05</u></td></tr><tr><th scope="row">DAPS</th><td>35.03</td><td>35.96</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td>Not evaluated</td><td><strong>41.04</strong></td></tr></tbody></table></div></div>
+   <p class="table-note">These results come from the paper’s separate experiment on applying the schedule to other methods. The best average in each column is bold and the second best is underlined. OptDiff was tested with the proposed schedule only.</p>
+   <p class="result-finding">The proposed schedule improves pixel accuracy for most tested methods. DAPS on MRI and ΠGDM on deblurring are exceptions. OptDiff has the highest average PSNR in both comparisons.</p>
+  </article>
+  <article class="result-section" id="reconstruction-results">
+   <h3 class="title is-4">2. Image quality with the same number of model calls</h3>
+   <p>We compare MRI reconstruction, removing blur (deblurring), and recovering detail from smaller images (super-resolution). Each method uses 100 calls to its diffusion model. The tables label this budget as 100 NFE, short for neural function evaluations; it does not mean that all methods take the same time.</p>
+   <figure class="paper-figure">
+  <a class="figure-link" href="static/images/qualitative_comparisons_alltasks.png" target="_blank" rel="noopener" aria-label="Enlarge figure: Example MRI scans and photographs reconstructed by existing methods and OptDiff, shown with reference images and maps of their differences. (opens in a new tab)">
+    <img src="static/images/qualitative_comparisons_alltasks.png" alt="Example MRI scans and photographs reconstructed by existing methods and OptDiff, shown with reference images and maps of their differences." width="5756" height="2820" loading="lazy" decoding="async" >
+  </a>
+  <figcaption><strong>Examples of reconstructed images.</strong> The figure compares different methods with the reference image for each task. Error maps show where they differ, with differences magnified 5× for MRI and 10× for photographs. The scores shown here describe these examples; the tables below summarize the full test sets. <a href="static/images/qualitative_comparisons_alltasks.png" target="_blank" rel="noopener">View full resolution<span class="sr-only"> (opens in a new tab)</span> ↗</a></figcaption>
+</figure>
+   <div class="results-explorer">
+    <p class="table-note"><strong>Reading the scores.</strong> PSNR measures pixel accuracy, SSIM measures similarity in image structure, and LPIPS estimates perceptual similarity using a learned model. Higher PSNR and SSIM are better; lower LPIPS is better. LPIPS is reported for photographs only. Values are averages ± standard deviations, which describe variation across test images. The best average is <strong>bold</strong> and the second best is <u>underlined</u>, including ties.</p>
+    <div class="result-tabs" aria-label="Reconstruction task" hidden><button type="button" id="tab-mri" aria-controls="results-mri">MRI</button><button type="button" id="tab-deblurring" aria-controls="results-deblurring">Deblurring</button><button type="button" id="tab-super-resolution" aria-controls="results-super-resolution">Super-resolution</button></div>
+    <section class="task-panel" id="results-mri" aria-labelledby="tab-mri">
+<h4 class="title is-5">MRI</h4><p>Reconstructing brain MRI images from a reduced set of measurements, using 330 test slices from fastMRI. R = 4 and R = 8 indicate fourfold and eightfold undersampling, respectively.</p>
+<div class="setting-control" hidden><label for="setting-mri">Images and test setting</label><select id="setting-mri"><option value="mri-setting-0">fastMRI · R = 8</option><option value="mri-setting-1">fastMRI · R = 4</option></select></div>
+<div class="result-setting" id="mri-setting-0"><h5 class="title is-6">fastMRI · R = 8</h5>
+<div class="table-container" role="region" aria-label="fastMRI · R = 8 at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>fastMRI · R = 8 · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>28.94 ± 1.54</td><td>0.774 ± 0.066</td></tr><tr><th scope="row">DiffPIR</th><td>27.17 ± 1.08</td><td>0.650 ± 0.072</td></tr><tr><th scope="row">ΠGDM</th><td>28.88 ± 1.27</td><td>0.734 ± 0.078</td></tr><tr><th scope="row">RED-diff</th><td><u>31.92 ± 1.44</u></td><td><u>0.840 ± 0.034</u></td></tr><tr><th scope="row">DDS</th><td>28.92 ± 1.28</td><td>0.828 ± 0.027</td></tr><tr><th scope="row">DAPS</th><td>31.38 ± 1.42</td><td>0.771 ± 0.057</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><strong>34.93 ± 1.38</strong></td><td><strong>0.921 ± 0.029</strong></td></tr></tbody></table></div>
+<p class="result-finding">OptDiff gives the closest average match to the reference images in both pixel accuracy (PSNR) and image structure (SSIM) at eightfold undersampling.</p></div><div class="result-setting" id="mri-setting-1"><h5 class="title is-6">fastMRI · R = 4</h5>
+<div class="table-container" role="region" aria-label="fastMRI · R = 4 at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>fastMRI · R = 4 · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>35.82 ± 1.46</td><td>0.775 ± 0.069</td></tr><tr><th scope="row">DiffPIR</th><td>30.33 ± 0.97</td><td>0.691 ± 0.077</td></tr><tr><th scope="row">ΠGDM</th><td>30.69 ± 1.37</td><td>0.753 ± 0.086</td></tr><tr><th scope="row">RED-diff</th><td><u>36.79 ± 1.43</u></td><td>0.872 ± 0.035</td></tr><tr><th scope="row">DDS</th><td>33.72 ± 1.14</td><td><u>0.930 ± 0.030</u></td></tr><tr><th scope="row">DAPS</th><td>34.32 ± 1.76</td><td>0.875 ± 0.041</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><strong>38.45 ± 1.58</strong></td><td><strong>0.948 ± 0.023</strong></td></tr></tbody></table></div>
+<p class="result-finding">OptDiff gives the closest average match to the reference images in both pixel accuracy (PSNR) and image structure (SSIM) at fourfold undersampling.</p></div>
+</section><section class="task-panel" id="results-deblurring" aria-labelledby="tab-deblurring">
+<h4 class="title is-5">Deblurring</h4><p>Removing simulated Gaussian blur from 330 images each from ImageNet, which contains varied photographs, and FFHQ, which contains faces. The settings describe the blur’s kernel size k and spread σ.</p>
+<div class="setting-control" hidden><label for="setting-deblurring">Images and test setting</label><select id="setting-deblurring"><option value="deblurring-setting-0">ImageNet · k = 6, σ = 3</option><option value="deblurring-setting-1">FFHQ · k = 6, σ = 3</option><option value="deblurring-setting-2">ImageNet · k = 12, σ = 3</option><option value="deblurring-setting-3">FFHQ · k = 12, σ = 3</option></select></div>
+<div class="result-setting" id="deblurring-setting-0"><h5 class="title is-6">ImageNet · k = 6, σ = 3</h5>
+<div class="table-container" role="region" aria-label="ImageNet · k = 6, σ = 3 at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>ImageNet · k = 6, σ = 3 · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>24.25 ± 3.97</td><td>0.602 ± 0.192</td><td>0.420 ± 0.187</td></tr><tr><th scope="row">DDRM</th><td>29.48 ± 3.65</td><td>0.815 ± 0.101</td><td>0.227 ± 0.118</td></tr><tr><th scope="row">DDNM</th><td><u>32.60 ± 3.89</u></td><td><u>0.906 ± 0.045</u></td><td><strong>0.030 ± 0.013</strong></td></tr><tr><th scope="row">DiffPIR</th><td>32.22 ± 3.68</td><td>0.892 ± 0.049</td><td><u>0.061 ± 0.032</u></td></tr><tr><th scope="row">RED-diff</th><td>28.65 ± 3.67</td><td>0.790 ± 0.087</td><td>0.185 ± 0.090</td></tr><tr><th scope="row">DAPS</th><td>31.39 ± 3.13</td><td>0.853 ± 0.047</td><td>0.107 ± 0.033</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><strong>33.07 ± 3.76</strong></td><td><strong>0.910 ± 0.040</strong></td><td><u>0.061 ± 0.031</u></td></tr></tbody></table></div>
+<p class="result-finding">OptDiff leads in pixel accuracy and structural similarity. DDNM leads on the learned perceptual score, showing that different measures can favor different methods.</p></div><div class="result-setting" id="deblurring-setting-1"><h5 class="title is-6">FFHQ · k = 6, σ = 3</h5>
+<div class="table-container" role="region" aria-label="FFHQ · k = 6, σ = 3 at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>FFHQ · k = 6, σ = 3 · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>33.00 ± 2.50</td><td>0.898 ± 0.034</td><td>0.078 ± 0.028</td></tr><tr><th scope="row">DDRM</th><td>36.84 ± 1.62</td><td>0.945 ± 0.013</td><td>0.065 ± 0.023</td></tr><tr><th scope="row">DDNM</th><td><u>36.95 ± 1.78</u></td><td><strong>0.949 ± 0.013</strong></td><td><strong>0.027 ± 0.008</strong></td></tr><tr><th scope="row">DiffPIR</th><td>36.58 ± 1.76</td><td>0.942 ± 0.014</td><td><u>0.040 ± 0.012</u></td></tr><tr><th scope="row">RED-diff</th><td>34.71 ± 1.74</td><td>0.908 ± 0.014</td><td>0.068 ± 0.020</td></tr><tr><th scope="row">DAPS</th><td>34.13 ± 1.39</td><td>0.888 ± 0.013</td><td>0.088 ± 0.021</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><strong>36.99 ± 1.82</strong></td><td><u>0.948 ± 0.013</u></td><td>0.060 ± 0.018</td></tr></tbody></table></div>
+<p class="result-finding">OptDiff has the highest average pixel accuracy. DDNM scores best on structural and perceptual similarity.</p></div><div class="result-setting" id="deblurring-setting-2"><h5 class="title is-6">ImageNet · k = 12, σ = 3</h5>
+<div class="table-container" role="region" aria-label="ImageNet · k = 12, σ = 3 at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>ImageNet · k = 12, σ = 3 · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>21.30 ± 3.27</td><td>0.484 ± 0.200</td><td>0.371 ± 0.159</td></tr><tr><th scope="row">DDRM</th><td>27.43 ± 3.83</td><td>0.740 ± 0.138</td><td>0.308 ± 0.142</td></tr><tr><th scope="row">DDNM</th><td><strong>28.07 ± 4.12</strong></td><td><strong>0.789 ± 0.110</strong></td><td><strong>0.134 ± 0.059</strong></td></tr><tr><th scope="row">DiffPIR</th><td>27.41 ± 3.72</td><td>0.746 ± 0.114</td><td><u>0.145 ± 0.064</u></td></tr><tr><th scope="row">RED-diff</th><td>24.19 ± 3.49</td><td>0.604 ± 0.171</td><td>0.428 ± 0.156</td></tr><tr><th scope="row">DAPS</th><td>26.28 ± 2.80</td><td>0.671 ± 0.086</td><td>0.247 ± 0.075</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><u>27.70 ± 3.87</u></td><td><u>0.772 ± 0.106</u></td><td>0.211 ± 0.088</td></tr></tbody></table></div>
+<p class="result-finding">DDNM scores best on all three measures. OptDiff ranks second in pixel accuracy and structural similarity.</p></div><div class="result-setting" id="deblurring-setting-3"><h5 class="title is-6">FFHQ · k = 12, σ = 3</h5>
+<div class="table-container" role="region" aria-label="FFHQ · k = 12, σ = 3 at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>FFHQ · k = 12, σ = 3 · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>25.88 ± 6.47</td><td>0.749 ± 0.129</td><td>0.159 ± 0.115</td></tr><tr><th scope="row">DDRM</th><td>29.46 ± 2.32</td><td>0.818 ± 0.051</td><td>0.194 ± 0.057</td></tr><tr><th scope="row">DDNM</th><td><u>32.54 ± 2.15</u></td><td><strong>0.893 ± 0.030</strong></td><td><u>0.074 ± 0.022</u></td></tr><tr><th scope="row">DiffPIR</th><td>32.05 ± 1.95</td><td>0.870 ± 0.030</td><td><strong>0.060 ± 0.019</strong></td></tr><tr><th scope="row">RED-diff</th><td>29.46 ± 2.32</td><td>0.818 ± 0.051</td><td>0.194 ± 0.057</td></tr><tr><th scope="row">DAPS</th><td>28.38 ± 2.19</td><td>0.786 ± 0.055</td><td>0.199 ± 0.040</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><strong>32.61 ± 2.22</strong></td><td><u>0.891 ± 0.031</u></td><td>0.127 ± 0.034</td></tr></tbody></table></div>
+<p class="result-finding">The strongest result depends on the measure: OptDiff leads in pixel accuracy, DDNM in structural similarity, and DiffPIR on the learned perceptual score.</p></div>
+</section><section class="task-panel" id="results-super-resolution" aria-labelledby="tab-super-resolution">
+<h4 class="title is-5">Super-resolution</h4><p>Recovering detail from images reduced by a factor of 4 or 16 in both width and height. We test 330 images each from ImageNet (varied photographs) and FFHQ (faces).</p>
+<div class="setting-control" hidden><label for="setting-super-resolution">Images and test setting</label><select id="setting-super-resolution"><option value="super-resolution-setting-0">FFHQ · 4×</option><option value="super-resolution-setting-1">ImageNet · 4×</option><option value="super-resolution-setting-2">FFHQ · 16×</option><option value="super-resolution-setting-3">ImageNet · 16×</option></select></div>
+<div class="result-setting" id="super-resolution-setting-0"><h5 class="title is-6">FFHQ · 4×</h5>
+<div class="table-container" role="region" aria-label="FFHQ · 4× at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>FFHQ · 4× · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>30.50 ± 2.62</td><td>0.866 ± 0.044</td><td><strong>0.071 ± 0.025</strong></td></tr><tr><th scope="row">DDRM</th><td>31.08 ± 2.31</td><td>0.869 ± 0.039</td><td>0.144 ± 0.041</td></tr><tr><th scope="row">DDNM</th><td>30.94 ± 2.45</td><td>0.872 ± 0.041</td><td><u>0.085 ± 0.028</u></td></tr><tr><th scope="row">DiffPIR</th><td>31.06 ± 2.44</td><td><u>0.873 ± 0.040</u></td><td>0.092 ± 0.031</td></tr><tr><th scope="row">RED-diff</th><td><u>31.25 ± 2.37</u></td><td><strong>0.875 ± 0.037</strong></td><td>0.108 ± 0.034</td></tr><tr><th scope="row">DAPS</th><td>29.63 ± 1.73</td><td>0.763 ± 0.028</td><td>0.179 ± 0.028</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><strong>31.33 ± 2.73</strong></td><td>0.869 ± 0.035</td><td>0.117 ± 0.035</td></tr></tbody></table></div>
+<p class="result-finding">OptDiff has the highest average pixel accuracy. RED-diff leads in structural similarity and DPS on the learned perceptual score.</p></div><div class="result-setting" id="super-resolution-setting-1"><h5 class="title is-6">ImageNet · 4×</h5>
+<div class="table-container" role="region" aria-label="ImageNet · 4× at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>ImageNet · 4× · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>23.72 ± 4.90</td><td>0.618 ± 0.209</td><td>0.299 ± 0.207</td></tr><tr><th scope="row">DDRM</th><td>25.49 ± 3.66</td><td>0.682 ± 0.157</td><td>0.355 ± 0.148</td></tr><tr><th scope="row">DDNM</th><td>25.79 ± 3.93</td><td>0.703 ± 0.152</td><td>0.286 ± 0.136</td></tr><tr><th scope="row">DiffPIR</th><td>25.28 ± 3.78</td><td>0.682 ± 0.152</td><td><u>0.242 ± 0.117</u></td></tr><tr><th scope="row">RED-diff</th><td>25.90 ± 3.86</td><td><u>0.708 ± 0.142</u></td><td>0.328 ± 0.148</td></tr><tr><th scope="row">DAPS</th><td><strong>26.50 ± 3.43</strong></td><td>0.706 ± 0.132</td><td><strong>0.239 ± 0.067</strong></td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><u>26.07 ± 3.96</u></td><td><strong>0.715 ± 0.148</strong></td><td>0.350 ± 0.156</td></tr></tbody></table></div>
+<p class="result-finding">DAPS leads in pixel accuracy and on the learned perceptual score. OptDiff ranks second in pixel accuracy and first in structural similarity.</p></div><div class="result-setting" id="super-resolution-setting-2"><h5 class="title is-6">FFHQ · 16×</h5>
+<div class="table-container" role="region" aria-label="FFHQ · 16× at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>FFHQ · 16× · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>22.62 ± 2.28</td><td>0.664 ± 0.086</td><td>0.286 ± 0.078</td></tr><tr><th scope="row">DDRM</th><td><u>23.25 ± 2.15</u></td><td><u>0.679 ± 0.083</u></td><td>0.319 ± 0.088</td></tr><tr><th scope="row">DDNM</th><td>22.86 ± 2.12</td><td>0.663 ± 0.083</td><td><u>0.249 ± 0.079</u></td></tr><tr><th scope="row">DiffPIR</th><td>22.77 ± 2.14</td><td>0.658 ± 0.085</td><td><strong>0.246 ± 0.077</strong></td></tr><tr><th scope="row">RED-diff</th><td>23.01 ± 2.07</td><td>0.663 ± 0.082</td><td>0.282 ± 0.082</td></tr><tr><th scope="row">DAPS</th><td>22.63 ± 1.96</td><td>0.572 ± 0.064</td><td>0.358 ± 0.046</td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><strong>23.58 ± 2.27</strong></td><td><strong>0.685 ± 0.083</strong></td><td>0.356 ± 0.094</td></tr></tbody></table></div>
+<p class="result-finding">OptDiff leads in pixel accuracy and structural similarity. DiffPIR scores best on the learned perceptual measure.</p></div><div class="result-setting" id="super-resolution-setting-3"><h5 class="title is-6">ImageNet · 16×</h5>
+<div class="table-container" role="region" aria-label="ImageNet · 16× at 100 NFE" tabindex="0"><table class="table is-fullwidth research-table"><caption>ImageNet · 16× · 100 NFE · Mean ± standard deviation</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR (dB) ↑</th><th scope="col">SSIM ↑</th><th scope="col">LPIPS ↓</th></tr></thead><tbody><tr><th scope="row">DPS</th><td>17.95 ± 3.02</td><td>0.365 ± 0.192</td><td><strong>0.388 ± 0.125</strong></td></tr><tr><th scope="row">DDRM</th><td>19.87 ± 2.52</td><td>0.452 ± 0.184</td><td>0.688 ± 0.195</td></tr><tr><th scope="row">DDNM</th><td>20.15 ± 2.68</td><td><u>0.460 ± 0.183</u></td><td>0.633 ± 0.207</td></tr><tr><th scope="row">DiffPIR</th><td>19.66 ± 2.61</td><td>0.439 ± 0.178</td><td>0.577 ± 0.194</td></tr><tr><th scope="row">RED-diff</th><td>20.34 ± 2.76</td><td><u>0.460 ± 0.182</u></td><td>0.704 ± 0.193</td></tr><tr><th scope="row">DAPS</th><td><strong>20.53 ± 2.49</strong></td><td>0.418 ± 0.136</td><td><u>0.522 ± 0.081</u></td></tr><tr class="ours"><th scope="row">OptDiff (ours)</th><td><u>20.44 ± 2.75</u></td><td><strong>0.468 ± 0.184</strong></td><td>0.704 ± 0.186</td></tr></tbody></table></div>
+<p class="result-finding">DAPS leads in pixel accuracy, while DPS scores best on the learned perceptual measure. OptDiff ranks second in pixel accuracy and first in structural similarity.</p></div>
+</section>
+   </div>
+  </article>
+ </div>
+</section>
+<section class="section" id="BibTeX" aria-labelledby="citation-title">
+ <div class="container is-max-desktop">
+  <div class="bibtex-header"><h2 class="title is-3" id="citation-title">Cite this work</h2><button class="copy-bibtex-btn" id="copy-bibtex" type="button"><span class="copy-text">Copy BibTeX</span></button></div>
+  <p class="citation-note">Accepted to NeurIPS 2026. <a href="static/optdiff.bib" download="optdiff.bib">Download BibTeX</a></p>
+  <pre><code id="bibtex-code">@inproceedings{oscanoa2026optdiff,
+  title  = {Principled Design of Diffusion-based Optimizers
+            for Inverse Problems},
+  author = {Oscanoa, Julio and Sivgin, Irmak and Alkan, Cagan
+            and Ennis, Daniel and Pauly, John and Pilanci, Mert
+            and Vasanawala, Shreyas},
+  year   = {2026},
+  booktitle = {Advances in Neural Information Processing Systems},
+  note   = {Accepted to NeurIPS 2026},
+  eprint = {2605.11506},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CV},
+  url    = {https://arxiv.org/abs/2605.11506}
+}</code></pre>
+  <p id="copy-status" role="status" aria-live="polite"></p>
+ </div>
+</section>
+</main>
+<footer class="footer"><div class="container is-max-desktop"><div class="content has-text-centered">
+ <p>Built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template">Academic Project Page Template</a>, adapted from <a href="https://nerfies.github.io/">Nerfies</a>.<br>The website template is licensed under <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
+</div></div></footer>
+</body>
+</html>
