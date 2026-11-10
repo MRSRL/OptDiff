@@ -1,0 +1,16 @@
+# @package _global_
+# Example OptDiff heuristic weights (optimizer_weights_config=example_weights): the paper's weights for R=8, NFE 100
+# (configs/mri/tuned/fastmri.yaml, R8.steps100.optdiff), fitted with momentum, the preconditioner and the noise schedule
+# sigma_max 0.2, sigma_min 0.00928, rho -3. Single values can be changed on the command line,
+# e.g. optimizer_weights_config.lamda.parameters=0.5.
+optimizer_weights_config:
+  parameterization: normalized  # OptDiff reparameterization: alpha hat, lamda hat, beta hat
+  alpha:
+    function: exp
+    parameters: [9.15873835, 0.04992987, 0.58709523]
+  beta:  # used with momentum
+    function: constant
+    parameters: 0.0575
+  lamda:
+    function: constant
+    parameters: 0.7

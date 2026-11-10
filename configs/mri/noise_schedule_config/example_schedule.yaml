@@ -1,0 +1,8 @@
+# @package _global_
+# Example OptDiff noise schedule (noise_schedule_config=example_schedule): the paper's schedule for R=8, NFE 100
+# (configs/mri/tuned/fastmri.yaml, R8.steps100.optdiff), with which optimizer_weights_config/example_weights.yaml
+# was fitted. Single values can be changed on the command line, e.g. noise_schedule_config.rho=-5.
+noise_schedule_config:
+  sigma_max: 0.2
+  sigma_min: 0.00928
+  rho: -3

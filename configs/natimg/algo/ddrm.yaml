@@ -1,0 +1,9 @@
+# @package _global_
+# Values marked ??? are required.
+defaults:
+  - /noise_schedule_config: standard  # or another file, e.g. noise_schedule_config=example_schedule
+algo: ddrm
+baseline_config:
+  seed: 0  # image i is seeded with seed + i
+  eta: ???  # stochasticity of the steps on missing components and those where y is noisier than x_t
+  eta_b: ???  # weight of the measurement on the components where y is less noisy than x_t, in [0, 1]

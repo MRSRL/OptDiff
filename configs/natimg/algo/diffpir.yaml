@@ -1,0 +1,9 @@
+# @package _global_
+# Values marked ??? are required.
+defaults:
+  - /noise_schedule_config: standard  # or another file, e.g. noise_schedule_config=example_schedule
+algo: diffpir
+baseline_config:
+  seed: 0  # image i is seeded with seed + i
+  lamb: ???  # regularization weight of the data proximal step
+  zeta: ???  # noise injection (0 = deterministic, 1 = fully stochastic)

@@ -1,0 +1,9 @@
+# @package _global_
+# Standard noise schedule of the baselines (noise_schedule_config=standard; their default): num_steps evenly spaced
+# timesteps of the network (model_config), as in DDIM and RED-diff: end_step, end_step + skip, ..., start_step - skip,
+# with skip = (start_step - end_step) / num_steps. The samplers run them from the highest down, then step to the clean
+# image.
+noise_schedule_config:
+  type: uniform
+  start_step: 1000
+  end_step: 0

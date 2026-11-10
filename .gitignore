@@ -1,0 +1,15 @@
+/training-runs
+*.pyc
+/sampled_images
+/.ipynb_checkpoints
+*.err
+*.out
+*.job
+/output
+/outputs
+/outputs*
+/.venv
+/checkpoints
+/data/imagenet
+/data/ffhq
+/data/fastmri

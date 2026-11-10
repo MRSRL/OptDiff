@@ -1,0 +1,15 @@
+# @package _global_
+# Values marked ??? are required.
+optimizer_config:
+  algo: OptDiff
+  order: 1
+  weights: ???  # optimal (NNLS against the reference), optimal_cnst_lamda, or heuristics (optimizer_weights_config)
+  momentum: true
+  preconditioner: false
+  preconditioner_degree: 2
+  preconditioner_file: data/poly_coeffs.npz
+  initial_estimate: cg_recon
+  num_noise_instances: 1
+  seed: 0
+  num_steps: ${noise_schedule_config.num_steps}
+optimizer_weights_config: null  # heuristic weights, needed with weights: heuristics

@@ -1,0 +1,113 @@
+# Tuned values for FFHQ, per task (data_config.deg) and number of steps (noise_schedule_config.num_steps).
+# scripts/run_optdiff_comparisons_natimg.py passes the entry <deg>.steps<num_steps> to main_natimg.py as
+# command-line overrides (utils/task_config.py). data_config holds the task's measurement noise (std, images in
+# [-1, 1]); an optdiff block holds the values of the config sections it fills, a ddnm / diffpir / dps / ddrm /
+# reddiff block those of baseline_config.
+
+sr4:
+  data_config: {input_noise: 0.01}
+  steps20:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true, initial_estimate: cg_recon, normalize_obs: false}
+      noise_schedule_config: {sigma_max: 1.6, sigma_min: 0.06, rho: -5}
+      optimizer_weights_config:
+        alpha: {function: linear, parameters: [-0.26361129, 5.24158061]}
+        beta: {function: constant, parameters: 0.31786275925046276}
+        lamda: {function: constant, parameters: 1.398}
+    ddnm: {eta: 0.85}
+    diffpir: {lamb: 5.0, zeta: 1.0}
+    reddiff: {lr: 0.1, grad_term_weight: 0.215, denoise_term_weight: sqrt}
+  steps100:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true, initial_estimate: cg_recon, normalize_obs: false}
+      noise_schedule_config: {sigma_max: 2, sigma_min: 0.01, rho: -7}
+      optimizer_weights_config:
+        alpha: {function: linear_2, parameters: [[-0.080288, 4.886999], 53, [-0.013905, 1.348]]}
+        beta: {function: linear, parameters: [-0.013052, 0.767665]}
+        lamda: {function: constant, parameters: 1.43}
+    ddnm: {eta: 0.85}
+    diffpir: {lamb: 1.0, zeta: 0.8}
+    dps: {eta: 0.8, grad_term_weight: 8.0}
+    ddrm: {eta: 1.0, eta_b: 1.0}
+    reddiff: {lr: 0.1, grad_term_weight: 0.25, denoise_term_weight: log}
+
+sr16:
+  data_config: {input_noise: 0.01}
+  steps20:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true, initial_estimate: cg_recon, normalize_obs: true}
+      noise_schedule_config: {sigma_max: 5, sigma_min: 0.5, rho: 1}
+      optimizer_weights_config:
+        alpha: {function: linear, parameters: [-0.74342151, 15.03350357]}
+        beta: {function: linear, parameters: [-0.01002744, 0.65741334]}
+        lamda: {function: constant, parameters: 0.35}
+    ddnm: {eta: 0.85}
+    diffpir: {lamb: 1.0, zeta: 0.8}
+    reddiff: {lr: 0.1, grad_term_weight: 0.464, denoise_term_weight: sqrt}
+  steps100:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true, initial_estimate: cg_recon, normalize_obs: true}
+      noise_schedule_config: {sigma_max: 5, sigma_min: 0.01, rho: 1}
+      optimizer_weights_config:
+        alpha: {function: linear, parameters: [-0.10820768, 12.3117388]}
+        beta: {function: constant, parameters: 0.70}
+        lamda: {function: constant, parameters: 0.474}
+    ddnm: {eta: 0.85}
+    diffpir: {lamb: 1.0, zeta: 0.7}
+    dps: {eta: 0.0, grad_term_weight: 8.0}
+    ddrm: {eta: 1.0, eta_b: 1.0}
+    reddiff: {lr: 0.1, grad_term_weight: 0.48, denoise_term_weight: log}
+
+deblur_gauss_window6_sigma3:
+  data_config: {input_noise: 0.01}
+  steps20:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true, initial_estimate: adjoint, normalize_obs: false}
+      noise_schedule_config: {sigma_max: 1, sigma_min: 0.01, rho: -1}
+      optimizer_weights_config:
+        alpha: {function: exp, parameters: [2.33504717, 0.0909769, 0.0]}
+        lamda: {function: constant, parameters: 3.8897027263005737}
+        beta: {function: linear, parameters: [-0.01874087, 0.43780345]}
+    ddnm: {eta: 0.0}
+    diffpir: {lamb: 10.0, zeta: 1.0}
+    reddiff: {lr: 0.316, grad_term_weight: 0.0215, denoise_term_weight: sqrt}
+  steps100:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true, initial_estimate: adjoint, normalize_obs: false}
+      noise_schedule_config: {sigma_max: 1, sigma_min: 0.01, rho: -1}
+      optimizer_weights_config:
+        alpha: {function: exp, parameters: [1.92581, 0.06913, 0.12231]}
+        lamda: {function: linear, parameters: [0.02396, 3.37897]}
+        beta: {function: exp, parameters: [0.47573, 0.06022, 0.02712]}
+    ddnm: {eta: 0.75}
+    diffpir: {lamb: 2.0, zeta: 1.0}
+    dps: {eta: 0.8, grad_term_weight: 10.0}
+    ddrm: {eta: 0.8, eta_b: 1.0}
+    reddiff: {lr: 0.316, grad_term_weight: 0.01, denoise_term_weight: sqrt}
+
+deblur_gauss_window12_sigma3:
+  data_config: {input_noise: 0.01}
+  steps20:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true, initial_estimate: adjoint, normalize_obs: false}
+      noise_schedule_config: {sigma_max: 10, sigma_min: 0.02, rho: -3}
+      optimizer_weights_config:
+        alpha: {function: constant, parameters: 2.38967306}
+        lamda: {function: constant, parameters: 1.7740062425600258}
+        beta: {function: constant, parameters: 0.7201592285843457}
+    ddnm: {eta: 0.7}
+    diffpir: {lamb: 5.0, zeta: 1.0}
+    reddiff: {lr: 0.215, grad_term_weight: 0.0215, denoise_term_weight: sqrt, initial_estimate: adjoint}
+  steps100:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true, initial_estimate: adjoint, normalize_obs: false}
+      noise_schedule_config: {sigma_max: 10, sigma_min: 0.01, rho: -3}
+      optimizer_weights_config:
+        alpha: {function: linear_2, parameters: [[-0.01032224, 2.19666123], 50, [-0.02950142, 3.13900421]]}
+        lamda: {function: constant, parameters: 1.56174046511311}
+        beta: {function: linear, parameters: [-0.00820672, 0.80353084]}
+    ddnm: {eta: 0.85}
+    diffpir: {lamb: 1.0, zeta: 0.8}
+    dps: {eta: 0.8, grad_term_weight: 10.0}
+    ddrm: {eta: 0.9, eta_b: 1.0}
+    reddiff: {lr: 0.316, grad_term_weight: 0.0215, denoise_term_weight: sqrt}

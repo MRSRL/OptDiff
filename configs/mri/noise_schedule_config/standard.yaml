@@ -1,0 +1,8 @@
+# @package _global_
+noise_schedule_config:
+  sigma_min: 2e-3
+  sigma_max: 2e1
+  rho: 7
+  num_steps: 100
+
+

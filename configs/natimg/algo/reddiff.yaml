@@ -1,0 +1,13 @@
+# @package _global_
+# Values marked ??? are required.
+defaults:
+  - /noise_schedule_config: standard  # or another file, e.g. noise_schedule_config=example_schedule
+algo: reddiff
+baseline_config:
+  seed: 0  # image i is seeded with seed + i
+  lr: ???  # Adam step size on the mean of q(x0 | y)
+  grad_term_weight: ???  # weight of the denoising term
+  denoise_term_weight: ???  # its weight over t, of sqrt(1 - alpha_t) / sqrt(alpha_t): linear, sqrt, log, square, trunc_linear, power2over3 or const
+  obs_weight: 1.0  # weight of the measurement term
+  sigma_x0: 0.0  # std of q(x0 | y); 0: x0 is its mean
+  initial_estimate: pinv  # starting mean: pinv (H_pinv(y), as in RED-diff) or adjoint (Ht(y))

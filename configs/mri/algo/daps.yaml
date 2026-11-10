@@ -1,0 +1,24 @@
+# @package _global_
+# NFE = noise_schedule_config.num_steps x daps_diffusion_scheduler_config.num_steps. Values marked ??? are required.
+optimizer_config:
+  algo: daps
+  weights: daps
+  order: 1
+  alpha_from_sigma_mode: edm
+  momentum: false
+  preconditioner: false
+  initial_estimate: cg_recon
+  num_noise_instances: 1
+  seed: 0
+  num_steps: ${noise_schedule_config.num_steps}
+  daps_diffusion_scheduler_config:  # reverse ODE from each noise level
+    num_steps: ???
+    sigma_min: 0.01
+    sigma_final: 0
+    schedule: linear
+    timestep: poly-7
+  daps_lgvd_config:  # Langevin dynamics on the measurement
+    num_steps: ???
+    lr: ???
+    tau: ???
+    lr_min_ratio: 0.01

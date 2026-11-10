@@ -1,0 +1,15 @@
+# @package _global_
+# RED-diff: OptDiff's first-order loop with RED-diff's weights. Values marked ??? are required.
+optimizer_config:
+  algo: OptDiff
+  order: 1
+  weights: reddiff
+  reddiff_lambda: ???  # regularization weight
+  reddiff_weight_fn: ???  # weighting over the noise levels: linear, square, log, sqrt or constant
+  reddiff_do_optimal_step: false
+  momentum: false
+  preconditioner: false
+  initial_estimate: cg_recon
+  num_noise_instances: 1
+  seed: 0
+  num_steps: ${noise_schedule_config.num_steps}

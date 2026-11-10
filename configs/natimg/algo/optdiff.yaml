@@ -1,0 +1,19 @@
+# @package _global_
+# Values marked ??? are required.
+defaults:
+  - /noise_schedule_config: edm  # OptDiff needs an EDM schedule: its values, or an edm file (e.g. example_schedule)
+algo: OptDiff
+optimizer_config:
+  order: 1
+  weights: ???  # optimal (NNLS against the reference) or heuristics (optimizer_weights_config)
+  momentum: true
+  preconditioner: false
+  preconditioner_degree: 2
+  preconditioner_file: data/poly_coeffs.npz
+  initial_estimate: cg_recon
+  normalize_obs: false  # divide the data-term weight by ||Hx - y|| (heuristic weights, and optimal weights with a fixed lamda)
+  num_noise_instances: 1
+  seed: 0
+  num_steps: ${noise_schedule_config.num_steps}
+  lamda: null
+optimizer_weights_config: null  # heuristic weights, needed with weights: heuristics

@@ -1,0 +1,17 @@
+# @package _global_
+# Values marked ??? are required.
+optimizer_config:
+  algo: pigdm
+  weights: pigdm
+  order: 1
+  pigdm_lambda: ???  # step size of the pseudoinverse guidance
+  pigdm_eta: ???  # DDIM stochasticity
+  pigdm_tikh_reg: 1e-4  # Tikhonov regularization of the pseudoinverse
+  pigdm_cg_iters: 30
+  alpha_from_sigma_mode: edm
+  momentum: false
+  preconditioner: false
+  initial_estimate: cg_recon
+  num_noise_instances: 1
+  seed: 0
+  num_steps: ${noise_schedule_config.num_steps}

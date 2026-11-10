@@ -1,0 +1,10 @@
+# @package _global_
+# EDM noise schedule (noise_schedule_config=edm; OptDiff's default): num_steps noise levels from sigma_max down to
+# sigma_min, sigma_i = (sigma_max^(1/rho) + i / (num_steps - 1) * (sigma_min^(1/rho) - sigma_max^(1/rho)))^rho,
+# each snapped to the closest noise level of the network (model_config). The values are given on the command line,
+# e.g. noise_schedule_config.sigma_max=5 noise_schedule_config.sigma_min=0.08 noise_schedule_config.rho=-7.
+noise_schedule_config:
+  type: edm
+  sigma_max: ???
+  sigma_min: ???
+  rho: ???

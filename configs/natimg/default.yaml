@@ -1,0 +1,32 @@
+# Default run (--config-name default): OptDiff on all FFHQ test images, Gaussian deblurring (window 6, sigma 3) with
+# 100 steps and the paper's values (configs/natimg/tuned/ffhq.yaml, deblur_gauss_window6_sigma3.steps100.optdiff).
+# Single values can be changed on the command line, e.g. data_config.slice=10 or noise_schedule_config.rho=-3; for
+# another task, dataset or method, start from ffhq.yaml or imagenet.yaml and give the values marked ??? there.
+defaults:
+  - ffhq
+  - _self_
+
+data_config:
+  deg: deblur_gauss_window6_sigma3
+  input_noise: 0.01
+
+noise_schedule_config:
+  num_steps: 100
+  sigma_max: 1
+  sigma_min: 0.01
+  rho: -1
+
+optimizer_config:
+  weights: heuristics
+  momentum: true
+  preconditioner: true
+  initial_estimate: adjoint
+  normalize_obs: false
+
+optimizer_weights_config:
+  alpha: {function: exp, parameters: [1.92581, 0.06913, 0.12231]}
+  lamda: {function: linear, parameters: [0.02396, 3.37897]}
+  beta: {function: exp, parameters: [0.47573, 0.06022, 0.02712]}
+
+output_config:
+  output_dir: ${hydra:runtime.cwd}/outputs/default  # reconstructions, metrics.txt and runtimes.txt

@@ -1,0 +1,15 @@
+# @package _global_
+# Values marked ??? are required.
+optimizer_config:
+  algo: dps
+  weights: dps
+  order: 1
+  dps_lambda: ???  # step size of the data term, divided by ||y - A x0_hat||
+  dps_eta: ???  # DDIM stochasticity
+  alpha_from_sigma_mode: edm
+  momentum: false
+  preconditioner: false
+  initial_estimate: cg_recon
+  num_noise_instances: 1
+  seed: 0
+  num_steps: ${noise_schedule_config.num_steps}

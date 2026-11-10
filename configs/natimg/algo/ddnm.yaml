@@ -1,0 +1,10 @@
+# @package _global_
+# Values marked ??? are required.
+defaults:
+  - /noise_schedule_config: standard  # or another file, e.g. noise_schedule_config=example_schedule
+algo: ddnm
+baseline_config:
+  seed: 0  # image i is seeded with seed + i
+  eta: ???  # DDIM stochasticity
+  travel_length: 0  # time-travel length (0 = off)
+  travel_repeat: 0  # time-travel repeats (0 = off)

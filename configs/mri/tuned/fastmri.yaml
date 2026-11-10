@@ -1,0 +1,130 @@
+# Tuned values for fastMRI brain T2, per acceleration (R<accel>) and NFE (steps<N>).
+# The file contains plain data, not loaded by Hydra: scripts/run_optdiff_comparisons_mri.py passes an entry to main_mri.py 
+# as command-line overrides (utils/task_config.py). data_config holds the acceleration's mask; a method (algo) block holds 
+# the values of the config sections it fills.
+# optimized_schedule: the baselines with OptDiff's noise schedule.
+
+R4:
+  data_config: {accel: 4, mask_path: data/masks/random1d_4_384.npy}
+  steps20:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true}
+      noise_schedule_config: {sigma_max: 0.2, sigma_min: 0.02, rho: -1}
+      optimizer_weights_config:
+        parameterization: normalized
+        alpha: {function: exp, parameters: [12.92945115, 0.15757343, 0.95891325]}
+        lamda: {function: constant, parameters: 0.5114918108978888}
+        beta: {function: constant, parameters: 0.04588188567323403}
+    reddiff:
+      optimizer_config: {reddiff_lambda: 0.05, reddiff_weight_fn: sqrt}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    dps:
+      optimizer_config: {dps_lambda: 10.0, dps_eta: 0.8}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    pigdm:
+      optimizer_config: {pigdm_lambda: 0.2, pigdm_eta: 0.8}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    daps:
+      optimizer_config:
+        daps_diffusion_scheduler_config: {num_steps: 2}
+        daps_lgvd_config: {num_steps: 20, lr: 1.0e-07, tau: 0.0002}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7, num_steps: 10}
+    diffpir:
+      optimizer_config: {diffpir_lambda: 0.2, diffpir_xi: 0.7}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+  steps100:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true}
+      noise_schedule_config: {sigma_max: 0.2, sigma_min: 0.00928, rho: -1}
+      optimizer_weights_config:
+        parameterization: normalized
+        alpha: {function: exp, parameters: [11.06737479, 0.09392276, 0.4840506]}
+        lamda: {function: constant, parameters: 0.674}
+        beta: {function: constant, parameters: 0.04892329625741785}
+    reddiff:
+      optimizer_config: {reddiff_lambda: 0.05, reddiff_weight_fn: sqrt}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    dps:
+      optimizer_config: {dps_lambda: 5.0, dps_eta: 0.8}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    pigdm:
+      optimizer_config: {pigdm_lambda: 0.05, pigdm_eta: 0.5}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    daps:
+      optimizer_config:
+        daps_diffusion_scheduler_config: {num_steps: 5}
+        daps_lgvd_config: {num_steps: 20, lr: 1.0e-07, tau: 0.0002}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7, num_steps: 20}
+    diffpir:
+      optimizer_config: {diffpir_lambda: 0.02, diffpir_xi: 0.2}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+
+R8:
+  data_config: {accel: 8, mask_path: data/masks/random1d_8_384.npy}
+  steps20:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true}
+      noise_schedule_config: {sigma_max: 0.2, sigma_min: 0.02, rho: -3}
+      optimizer_weights_config:
+        parameterization: normalized
+        alpha: {function: linear, parameters: [-0.45060068, 10.37490963]}
+        beta: {function: constant, parameters: 0.0557}
+        lamda: {function: constant, parameters: 0.6}
+    reddiff:
+      optimizer_config: {reddiff_lambda: 0.05, reddiff_weight_fn: sqrt}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    dps:
+      optimizer_config: {dps_lambda: 10.0, dps_eta: 0.8}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    pigdm:
+      optimizer_config: {pigdm_lambda: 0.2, pigdm_eta: 0.8}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    daps:
+      optimizer_config:
+        daps_diffusion_scheduler_config: {num_steps: 2}
+        daps_lgvd_config: {num_steps: 20, lr: 1.0e-07, tau: 0.0002}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7, num_steps: 10}
+    diffpir:
+      optimizer_config: {diffpir_lambda: 0.2, diffpir_xi: 0.5}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+  steps100:
+    optdiff:
+      optimizer_config: {weights: heuristics, momentum: true, preconditioner: true}
+      noise_schedule_config: {sigma_max: 0.2, sigma_min: 0.00928, rho: -3}
+      optimizer_weights_config:
+        parameterization: normalized
+        alpha: {function: exp, parameters: [9.15873835, 0.04992987, 0.58709523]}
+        beta: {function: constant, parameters: 0.0575}
+        lamda: {function: constant, parameters: 0.7}
+    reddiff:
+      optimizer_config: {reddiff_lambda: 0.05, reddiff_weight_fn: sqrt}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    dps:
+      optimizer_config: {dps_lambda: 2.0, dps_eta: 0.5}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    pigdm:
+      optimizer_config: {pigdm_lambda: 0.05, pigdm_eta: 0.5}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    daps:
+      optimizer_config:
+        daps_diffusion_scheduler_config: {num_steps: 5}
+        daps_lgvd_config: {num_steps: 20, lr: 1.0e-07, tau: 0.0002}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7, num_steps: 20}
+    diffpir:
+      optimizer_config: {diffpir_lambda: 0.05, diffpir_xi: 0.2}
+      noise_schedule_config: {sigma_max: 20.0, sigma_min: 0.002, rho: 7}
+    optimized_schedule:
+      reddiff:
+        optimizer_config: {reddiff_lambda: 0.05, reddiff_weight_fn: sqrt}
+        noise_schedule_config: {sigma_max: 0.2, sigma_min: 0.00928, rho: -3}
+      dps:
+        optimizer_config: {dps_lambda: 2.0, dps_eta: 0.5}
+        noise_schedule_config: {sigma_max: 0.2, sigma_min: 0.00928, rho: -3}
+      pigdm:
+        optimizer_config: {pigdm_lambda: 0.01, pigdm_eta: 0.0}
+        noise_schedule_config: {sigma_max: 0.2, sigma_min: 0.00928, rho: -3}
+      daps:
+        optimizer_config:
+          daps_diffusion_scheduler_config: {num_steps: 5}
+          daps_lgvd_config: {num_steps: 30, lr: 1.0e-07, tau: 0.000258}
+        noise_schedule_config: {sigma_max: 0.2, sigma_min: 0.00928, rho: -3, num_steps: 20}

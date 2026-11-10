@@ -1,0 +1,9 @@
+# @package _global_
+# Values marked ??? are required.
+defaults:
+  - /noise_schedule_config: standard  # or another file, e.g. noise_schedule_config=example_schedule
+algo: dps
+baseline_config:
+  seed: 0  # image i is seeded with seed + i
+  eta: ???  # DDIM stochasticity
+  grad_term_weight: ???  # step size of the measurement gradient, divided by the residual norm ||y - H(x0)||

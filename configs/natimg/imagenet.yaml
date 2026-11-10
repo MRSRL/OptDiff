@@ -1,0 +1,76 @@
+# Values marked ??? are required.
+defaults:
+  - _self_
+  - algo: optdiff  # optdiff (optimizer_config), or a baseline: ddnm, diffpir, dps, ddrm, reddiff (baseline_config)
+  # The algo config selects the default noise schedule (configs/natimg/noise_schedule_config: edm for OptDiff,
+  # standard for the baselines); another file is selected by name, e.g. noise_schedule_config=example_schedule.
+  # A file selected by name (optimizer_weights_config=example_weights) sets the OptDiff heuristic weights.
+  - optimizer_weights_config: null
+
+data_config:
+  slice: all  # all test images, the first N images (an integer) or a list of indices
+  input_dir: data/imagenet  # scripts/prepare_natimg.py
+  loader:
+    _target_: utils.datasets_natimg.ImageNetSubsetDataset
+    folder_path: ${data_config.input_dir}
+    image_size: 256
+  deg: ???  # the task; see utils/degradations_natimg.py for the options
+  input_noise: ???  # measurement noise std, images in [-1, 1]
+
+model_config:
+  name: imagenet256_uncond
+  checkpoint: checkpoints/imagenet/256x256_diffusion_uncond.pt  # download.sh
+  device: 0
+  # DDPM schedule the network was trained with (fixed by the checkpoint): its noise levels alpha_bar_t
+  beta_schedule: linear
+  beta_start: 0.0001
+  beta_end: 0.02
+  num_diffusion_timesteps: 1000
+
+model:
+  _target_: utils.models_natimg.create_model
+  in_channels: 3
+  out_channels: 3
+  num_channels: 256
+  num_heads: 4
+  num_res_blocks: 2
+  attention_resolutions: "32,16,8"
+  dropout: 0.0
+  resamp_with_conv: True
+  learn_sigma: True
+  use_scale_shift_norm: true
+  use_fp16: true
+  resblock_updown: true
+  num_heads_upsample: -1
+  var_type: 'fixedsmall'
+  num_head_channels: 64
+  image_size: 256
+  class_cond: false
+  use_checkpoint: true
+  use_new_attention_order: false
+  ckpt: "imagenet_256_uncond"
+
+noise_schedule_config:  # steps over the network's noise levels; the schedule file adds its type and values
+  num_steps: ???
+
+output_config:
+  output_dir_str: imagenet_test
+  output_dir: ${hydra:runtime.cwd}/outputs
+  save_images: True
+  save_data: False
+  save_txt: True
+  create_new_dir: False
+  include_in_filenames: [data, noise_schedule]
+  include_in_txt: [data, noise_schedule]
+
+debug_config:
+  debug: False
+  save_gradients: False
+  debug_filename: debug_outputs
+  save_loss_denoise_multilevel: False
+  num_noise_levels: 1
+  save_loss_multifreq: False
+  num_freq_levels: 6
+  save_data: False
+  save_images: False
+  save_every: 25

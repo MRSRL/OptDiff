@@ -1,0 +1,15 @@
+# @package _global_
+# Example OptDiff heuristic weights (optimizer_weights_config=example_weights): the paper's weights for ImageNet sr4,
+# 20 steps (configs/natimg/tuned/imagenet.yaml, sr4.steps20.optdiff), fitted with momentum, the preconditioner,
+# normalize_obs false and noise_schedule_config=example_schedule. Single values can be changed on the command line,
+# e.g. optimizer_weights_config.lamda.parameters=2.0.
+optimizer_weights_config:
+  alpha:
+    function: linear
+    parameters: [-0.256516, 5.7207276]
+  lamda:
+    function: constant
+    parameters: 2.5061100871006348
+  beta:  # used with momentum
+    function: linear
+    parameters: [-0.04275091, 0.89096716]

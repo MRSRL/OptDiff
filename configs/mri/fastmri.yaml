@@ -1,0 +1,49 @@
+# fastMRI brain T2 (coil-compressed to 8 channels, 384 x 384). Values marked ??? are required.
+defaults:
+  - _self_
+  - algo: optdiff  # optdiff, reddiff, dps, pigdm, daps or diffpir (optimizer_config)
+  # Files selected by name (e.g. noise_schedule_config=standard, optimizer_weights_config=example_weights) set the noise
+  # schedule or the OptDiff heuristic weights
+  - noise_schedule_config: null
+  - optimizer_weights_config: null
+
+data_config:
+  file: ???  # volume index in input_dir
+  slice: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # slices of the volume
+  input_dir: data/fastmri  # scripts/prepare_fastmri.py
+  accel: ???
+  mask_type: saved_mask  # or a generated mask: random1d, equispacedfraction1d, ...
+  mask_path: ???  # saved mask (data/masks/random1d_<accel>_384.npy)
+  calib_size: 16  # calibration lines of a generated mask; unused with a saved mask
+
+model_config:
+  directory: checkpoints/fastmri  # download.sh
+  name: network-snapshot.pkl
+  device: 0
+
+noise_schedule_config:  # EDM sigma schedule
+  sigma_max: ???
+  sigma_min: ???
+  rho: ???
+  num_steps: ???
+
+output_config:
+  output_dir_str: fastmri
+  output_dir: ${hydra:runtime.cwd}/outputs
+  save_images: True
+  save_data: False
+  save_txt: True
+  create_new_dir: False
+  include_in_filenames: [data, optimizer]
+  include_in_txt: [data, noise_schedule, optimizer]
+
+debug_config:
+  debug: False
+  debug_filename: debug_outputs
+  save_loss_denoise_multilevel: False
+  num_noise_levels: 1
+  save_loss_multifreq: False
+  num_freq_levels: 6
+  save_data: False
+  save_images: False
+  save_every: 1

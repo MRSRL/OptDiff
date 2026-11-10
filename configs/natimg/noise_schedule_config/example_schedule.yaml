@@ -1,0 +1,9 @@
+# @package _global_
+# Example EDM noise schedule (noise_schedule_config=example_schedule): the paper's OptDiff schedule for ImageNet sr4,
+# 20 steps (configs/natimg/tuned/imagenet.yaml, sr4.steps20.optdiff). Single values can be changed on the command
+# line, e.g. noise_schedule_config.rho=-3.
+noise_schedule_config:
+  type: edm
+  sigma_max: 5
+  sigma_min: 0.08
+  rho: -7
