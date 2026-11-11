@@ -167,7 +167,7 @@ OptDiff's noise schedule and heuristic weights can be set in two ways, as in the
   one of the paper's settings as `example_schedule.yaml` and `example_weights.yaml`. For your own setting, copy them,
   change the values and select the copies by name. Single values on the command line still override a file, e.g.
   `noise_schedule_config.rho=-5`.
-- **Values on the command line.** The schedule as `noise_schedule_config.sigma_max`, `sigma_min` and `rho`, and the
+- **Values on the command line.** You can specify values the schedule as `noise_schedule_config.sigma_max`, `sigma_min` and `rho`, and the
   weights as one value, `'optimizer_weights_config={alpha:{...},lamda:{...},beta:{...}}'`.
 
 A natural-image schedule file sets `type: edm` with `sigma_max`, `sigma_min` and `rho`, or `type: uniform` with
